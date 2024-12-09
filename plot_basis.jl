@@ -2,16 +2,16 @@ using Plots
 
 # STO와 GTO 기저 함수 정의
 function sto(r, n, etha)
-    return r^(n-1) * exp(-etha*r)
+    return abs(r)^(n-1) * exp(-etha*abs(r))
 end
 
 function gto(r, n, alpha)
-    return r^(n-1) * exp(-alpha*r^2)
+    return abs(r)^(n-1) * exp(-alpha*r^2)
 end
 
 # 비교 플롯 생성
 function compare_basis()
-    r = 0:0.1:10
+    r = -5:0.1:5
     
     # 1s orbital (n=1)
     sto_1s = sto.(r, 1, 1.0)
@@ -33,7 +33,7 @@ function compare_basis()
         xlabel="distance (Bohr)",
         ylabel="amplitude")
     
-    plot(p1, p2, layout=(2,1), size=(800,600))
+    plot(p1, p2, layout=(2,1), size=(800,800))
 end
 
 # STO-nG 기저함수 정의
@@ -62,7 +62,7 @@ sto6g_params = [
 ]
 
 function compare_basis_extended()
-    r = 0:0.1:10
+    r = -5:0.1:5
     
     # 1s 오비탈 비교
     sto_1s = sto.(r, 1, 1.0)
@@ -93,3 +93,63 @@ compare_basis_extended()
 
 # 플롯 생성 및 표시
 # compare_basis()
+
+# 구면 조화 함수 (l=2, m=0 for 3d_z2)
+function Y_20(theta, phi)
+    return 0.25 * sqrt(5/π) * (3*cos(theta)^2 - 1)
+end
+
+# 3d 오비탈 함수 (3d_z2)
+function orbital_3d(r, theta, phi, type="sto")
+    # 반지름 부분
+    if type == "sto"
+        R = r^2 * exp(-r)  # n=3 for 3d orbital
+    else  # gto
+        R = r^2 * exp(-0.3*r^2)  # alpha 값은 적절히 조정
+    end
+    
+    # 각도 부분 (3d_z2 오비탈)
+    Y = Y_20(theta, phi)
+    
+    return R * Y
+end
+
+function plot_3d_orbital()
+    # 구면 좌표계 그리드 생성
+    r = range(0, 5, length=50)
+    theta = range(0, π, length=50)
+    phi = range(0, 2π, length=50)
+    
+    # 메쉬그리드 생성
+    R = [r_i for r_i in r, _ in theta]
+    Θ = [theta_i for _ in r, theta_i in theta]
+    
+    # 카테시안 좌표로 변환
+    X = R .* sin.(Θ)
+    Y = zeros(size(X))  # phi=0 평면에서의 단면
+    Z = R .* cos.(Θ)
+    
+    # 오비탈 값 계산
+    V_sto = [orbital_3d(R[i,j], Θ[i,j], 0.0, "sto") for i in 1:size(R,1), j in 1:size(R,2)]
+    V_gto = [orbital_3d(R[i,j], Θ[i,j], 0.0, "gto") for i in 1:size(R,1), j in 1:size(R,2)]
+    
+    # 플롯 생성
+    p1 = surface(X, Z, V_sto,
+        title="3d_z² STO orbital",
+        xlabel="x",
+        ylabel="z",
+        zlabel="ψ",
+        camera=(45, 45))
+    
+    p2 = surface(X, Z, V_gto,
+        title="3d_z² GTO orbital",
+        xlabel="x",
+        ylabel="z",
+        zlabel="ψ",
+        camera=(45, 45))
+    
+    plot(p1, p2, layout=(1,2), size=(1200,500))
+end
+
+# 3D 오비탈 플롯 생성
+plot_3d_orbital()
