@@ -2,7 +2,7 @@
 
 julia_version = "1.11.1"
 manifest_format = "2.0"
-project_hash = "f2214e68e27d459de4eb55384af0d1dd07b7ef02"
+project_hash = "1767899da633e4815fc0fcaf343ce4a85f803b38"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -1912,6 +1912,12 @@ deps = ["LinearAlgebra"]
 git-tree-sha1 = "1feb45f88d133a655e001435632f019a9a1bcdb6"
 uuid = "62fd8b95-f654-4bbd-a8a5-9c27f68ccd50"
 version = "0.1.1"
+
+[[deps.TensorCrossInterpolation]]
+deps = ["EllipsisNotation", "LinearAlgebra", "QuadGK"]
+git-tree-sha1 = "378bca655cc4596c9db7adba9ac3e089bac9e3c5"
+uuid = "b261b2ec-6378-4871-b32e-9173bb050604"
+version = "0.9.14"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
